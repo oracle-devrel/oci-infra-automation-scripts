@@ -1,0 +1,75 @@
+name: 'oci-fn-build'
+permissions:
+  contents: read
+on:
+  # Trigger the workflow on push or pull request,
+  # but only for the main branch
+  workflow_dispatch:
+    inputs:
+      OCI_FN_APP:
+        description: Function app name
+        default: dip-str
+      OCI_FN_COMPARTMENT:
+        description: Function compartment
+        default: ocid1.compartment.oc1..aaaaaaaanovmfmmnonjjyxeq4jyghszj2eczlrkgj5svnxrtrvqvfhmbubeq
+      OCI_FN_NAME:
+        description: Function Name
+        default: oci-logs-stream
+      OCI_FN_IMAGE:
+        description: OCIR Image to use for Function
+        default: bom.ocir.io/bmpmwyacrlcj/repodip1/oci-logs-stream:0.0.19
+jobs:
+  # This workflow contains a single job called "build"
+  Build:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+           
+        # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+        # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+     - uses: actions/checkout@v4       
+
+      # Runs a set of commands using the runners shell
+     - name: 'Write Config & Key Files'
+       run: |
+            mkdir ~/.oci
+            echo "[DEFAULT]" >> ~/.oci/config
+            echo "user=${{secrets.OCI_CLI_USER}}" >> ~/.oci/config
+            echo "fingerprint=${{secrets.OCI_CLI_FINGERPRINT}}" >> ~/.oci/config
+            echo "tenancy=${{secrets.OCI_CLI_TENANCY}}" >> ~/.oci/config
+            echo "region=${{secrets.OCI_CLI_REGION}}" >> ~/.oci/config         
+            echo "${{secrets.OCI_CLI_KEY_CONTENT}}" >> ~/.oci/key.pem
+            echo "key_file=~/.oci/key.pem" >> ~/.oci/config    
+          
+     - name: 'Install OCI CLI'
+       run: |
+            curl -L -O https://raw.githubusercontent.com/oracle/oci-cli/master/scripts/install/install.sh
+            chmod +x install.sh
+            ./install.sh --accept-all-defaults          
+            export PATH=$PATH:/home/runner/bin
+            exec -l $SHELL
+            
+     - name: 'Fix Config File Permissions'
+       run: |
+            export PATH=$PATH:/home/runner/bin
+            oci setup repair-file-permissions --file ~/.oci/key.pem
+            oci setup repair-file-permissions --file ~/.oci/config
+      
+     - name: 'Install Fn CLI'
+       run: |
+            curl -LSs https://raw.githubusercontent.com/fnproject/cli/master/install | sh
+  
+     - name: 'Docker login'
+       run: docker login -u ${{ vars.OCI_FN_USER }} -p ${{ secrets.OCI_CLI_AUTH_TOKEN }} ${{ vars.OCI_FN_OCIR }}
+            
+     - name: 'Setting up Fn context'
+       run: |
+            fn create context dipeshrathod60 --provider oracle
+            fn use context dipeshrathod60
+            fn update context registry ${{ vars.OCI_FN_REGISTRY }}         
+            fn update context oracle.compartment-id ${{ inputs.OCI_FN_COMPARTMENT }}
+            fn update context api-url ${{ vars.OCI_FN_API_URL }}
+     - name: 'Build Image for OCI Function'
+       run: fn build --verbose
+     - name: 'Push image to OCI Registry'
+       run: fn push --verbose
