@@ -2,8 +2,8 @@ name: 'oci-fn-deploy'
 permissions:
   contents: read
 on:
-  # Trigger the workflow on push or pull request,
-  # but only for the main branch
+  # Add Trigger for push or pull request, if needed
+  
   workflow_dispatch:
     inputs:
       OCI_FN_NAME:
@@ -18,9 +18,15 @@ on:
       OCI_FN_IMAGE:
         description: OCIR Image to use for Function
         default: bom.ocir.io/<imagepath-oci:0.0.2>
+      WORKFLOW_TYPE:
+        description: Workflow Type for create or updae function
+        type: choice
+        options:
+          - create
+          - update
 
 jobs:
-  # This workflow contains a single job called "build"  
+  # This workflow contains a single job called "Deploy"  
   Deploy:
    runs-on: ubuntu-latest
         
@@ -65,7 +71,8 @@ jobs:
           fn use context ${{ vars.OCI_TENANCY_NAME }}
           fn update context registry ${{ vars.OCI_FN_REGISTRY }}         
           fn update context oracle.compartment-id ${{ inputs.OCI_FN_COMPARTMENT }}
-          fn update context api-url ${{ vars.OCI_FN_API_URL }}      
+          fn update context api-url ${{ vars.OCI_FN_API_URL }}   
+          
    - name: 'Create or Update OCI Function'
      run: |
-         fn update function ${{ inputs.OCI_FN_APP }} ${{ inputs.OCI_FN_NAME }} --image ${{ inputs.OCI_FN_IMAGE }}
+         fn ${{ inputs.WORKFLOW_TYPE }} function ${{ inputs.OCI_FN_APP }} ${{ inputs.OCI_FN_NAME }} ${{ inputs.OCI_FN_IMAGE }}
