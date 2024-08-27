@@ -2,8 +2,7 @@ name: 'oci-fn-build'
 permissions:
   contents: read
 on:
-  # Trigger the workflow on push or pull request,
-  # but only for the main branch
+  # Add Trigger for push or pull request, if needed
   workflow_dispatch:
     inputs:
       OCI_FN_COMPARTMENT:
