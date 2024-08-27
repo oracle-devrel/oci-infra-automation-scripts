@@ -11,7 +11,7 @@ This is a reference yaml as an action workflow to build and deploy the OCI funct
 
 Deploy a function using the Fn Project CLI, the function is built as a Docker image and pushed to a specified Docker registry. 
 
-- Provide value for non senstive information as an input and update during runtime.
+- Provide value for non senstive information as an workflow input and update during runtime.
 
     ```
       OCI_FN_NAME
@@ -20,7 +20,7 @@ Deploy a function using the Fn Project CLI, the function is built as a Docker im
       OCI_FN_IMAGE
     ````
 
-- Create environment variables for other non senstive information.
+- Create environment/git variables for other non senstive information.
   
   ```
   OCI_TENANCY_NAME

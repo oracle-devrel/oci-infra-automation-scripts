@@ -2,8 +2,7 @@ name: 'oci-fn-build'
 permissions:
   contents: read
 on:
-  # Trigger the workflow on push or pull request,
-  # but only for the main branch
+  # Add Trigger for push or pull request, if needed
   workflow_dispatch:
     inputs:
       OCI_FN_APP:
@@ -19,7 +18,7 @@ on:
         description: OCIR Image to use for Function
         default: bom.ocir.io/bmpmwyacrlcj/repodip1/oci-logs-stream:0.0.19
 jobs:
-  # This workflow contains a single job called "build"
+  # This workflow contains a single job called "Build"
   Build:
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
