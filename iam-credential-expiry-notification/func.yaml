@@ -1,0 +1,23 @@
+schema_version: 20180708
+name: identity_sol
+version: 0.0.1
+runtime: python
+build_image: fnproject/python:3.9-dev
+run_image: fnproject/python:3.9
+entrypoint: /python/bin/fdk /function/func.py handler
+memory: 256
+config:
+  critical_in_days: "90"
+  domain_ocids: ocid1.domain.oc1..aaaaaaaanp
+  exception_users: user1@demo.com@default
+  expiry_in_days: "60"
+  host: smtp.email.ap-mumbai-1.oci.oraclecloud.com
+  monthly_report_day: "5"
+  port: "587"
+  report_recipients: user1@demo.com
+  report_requested: "yes"
+  sender: noreply@notification.ap-mumbai-1.oci.oraclecloud.com
+  smtppass: ocid1.vaultsecret.oc1.ap-mumbai-1.amaaaaaai
+  smtpuser: ocid1.user.oc1..aaaaaaaa
+  warning_in_days: "30"
+  weekly_report_day: friday
