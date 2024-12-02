@@ -41,12 +41,12 @@ An approved sender must be set up for all “From:” addresses sending mail thr
 5. Click Add to add email address to your Approved Senders list.
 
 ### Create secret in OCI vault
-1. Open the navigation menu, click Identity & Security, and then click Vault.
-2. Under List scope, select a compartment that contains the vault.
+1. Open the **navigation menu**, click **Identity & Security**, and then click **Vault**.
+2. Under List scope, select a **compartment** that contains the vault.
     > Note: If you need to create a new vault and master encryption key, follow the instructions in Create Vault and Master Encryption Key.
 
-3. Under Resources, click Create Secret and select appropriate master encryption key.
-4. Enter smptppass in name field and description SMTP password for OCI email delivery authentication.
+3. Under **Resources**, click **Create Secret** and select appropriate master encryption key.
+4. Enter **smptppass** in name field and description SMTP password for OCI email delivery authentication.
 5. Select the format plain-text for Secret Type Template and enter smtp password, for contents of the secret.
     > Note: Please store SMTP password to OCI vault.
 
@@ -77,15 +77,15 @@ fn -v deploy --app <app-name>
 Example: fn -v deploy --app expiry-notification-app
 ```
 ## Create Schedule in Resource Scheduler
-1. Open the navigation menu and click Governance & Administration.
-2. Under Resource Scheduler, click Schedules.
-3. Under Create a Schedule, click Create a Schedule. The Create a schedule dialog box opens.
-4. Fill up schedule name, schedule description and action to be executed as start under basic information and click Next.
-5. Under resources select your function compartment and function and click Next. 
-6. Under schedule select Daily and configure other parameters as per your requirement.
-7. In the Repeat every field, enter how often you would like the schedule to run or use the menu to select an interval. The minimum value is 1. The maximum value is 99.
-8. In the Start Time field, enter the time in hours and minutes in 24-hour format.
-9. Click Next to go to the Review and Create Schedule.
+1. Open the **navigation menu** and click **Governance & Administration**.
+2. Under **Resource Scheduler**, click **Schedules**.
+3. Under **Create a Schedule**, click Create a Schedule. The Create a schedule dialog box opens.
+4. Fill up schedule name, schedule description and action to be executed as **start** under basic information and click Next.
+5. Under resources **select your function compartment** and function and click Next. 
+6. Under schedule select **Daily** and configure **other parameters** as per your requirement.
+7. In the **Repeat every field**, enter how often you would like the schedule to run or use the menu to select an interval. The minimum value is 1. The maximum value is 99.
+8. In the **Start Time** field, enter the time in hours and minutes in 24-hour format.
+9. Click **Next** to go to the **Review** and **Create Schedule**.
 
  You will now receive expiry email notification for IAM credential.
 
