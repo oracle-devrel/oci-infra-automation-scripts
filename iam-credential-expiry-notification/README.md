@@ -30,15 +30,15 @@ This is a automation solution to receive early email notification for expiry IAM
 
 ### Configure approved sender in email delivery
 An approved sender must be set up for all “From:” addresses sending mail through OCI.
-
-1. Open the navigation menu of OCI Console and click Developer Services.
-2. Under Application Integration, click Email Delivery.
-3. Under Email Delivery, click Approved Senders.
-4. Click Create Approved Sender and enter the email address that you want to list as an approved sender.
+  > You could use your SMTP relay service, else leverage OCI email delivery.
+1. Open the **navigation menu** of OCI Console and click **Developer Services**.
+2. Under **Application Integration**, click **Email Delivery**.
+3. Under Email Delivery, click **Approved Senders**.
+4. Click **Create Approved Sender** and enter the email address that you want to list as an approved sender.
 
     > Note: If your OCI email delivery SMTP connection endpoint is smtp.email.ap-mumbai-1.oci.oraclecloud.com then add noreply@notification to region and enter in approved sender email address. For example, noreply@notification.ap-mumbai-1.oci.oraclecloud.com.
 
-5. Click Add to add email address to your Approved Senders list.
+5. Click Add to **add email address** to your Approved Senders list.
 
 ### Create secret in OCI vault
 1. Open the **navigation menu**, click **Identity & Security**, and then click **Vault**.
