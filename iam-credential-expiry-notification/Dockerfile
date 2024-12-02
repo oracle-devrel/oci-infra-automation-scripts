@@ -13,8 +13,5 @@ COPY --from=build-stage /python /python
 COPY --from=build-stage /function /function
 RUN chmod -R o+r /function
 ENV PYTHONPATH=/function:/python
-#RUN microdnf update
-#ENTRYPOINT ["/python/bin/fdk", "/function/func.py", "handler"]
-RUN microdnf install -y openssh-server sudo
-RUN systemctl enable sshd.service
-ENTRYPOINT ["/usr/sbin/init"]
+RUN microdnf update
+ENTRYPOINT ["/python/bin/fdk", "/function/func.py", "handler"]
