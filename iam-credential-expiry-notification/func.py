@@ -213,9 +213,13 @@ def handler(ctx, data: io.BytesIO=None):
             # Initialize service client with default config file
             identity_domains_client = oci.identity_domains.IdentityDomainsClient(config={}, signer=signer, service_endpoint=domain_endpoint)
 
-            list_users_response = identity_domains_client.list_users(limit=100000).data
-
-            for user in list_users_response.resources:
+            list_users_response = identity_domains_client.list_users()
+            users = list_users_response.data.resources
+            while list_users_response.has_next_page:
+                list_users_response = identity_domains_client.list_users(page=list_users_response.next_page)
+                users.extend(list_users_response.data.resources)
+            logging.getLogger().info('fetched ' + str(len(users)) + ' users')
+            for user in users:
                 user_ocid = user.ocid
                 user_name = user.user_name
                 user_email = ""
@@ -294,6 +298,7 @@ def handler(ctx, data: io.BytesIO=None):
             """
             #recipient = str(user_email).split(",")
             recipient = str(user_email)
+            logging.getLogger().info('sending email')
             send_email(SUBJECT,secret_client,cfg,BODY_HTML,"",recipient)
 
         if report_requested :
