@@ -1,0 +1,14 @@
+schema_version: 20180708
+name: iam_user_capability-management
+version: 0.0.1
+runtime: python
+build_image: fnproject/python:3.9-dev
+run_image: fnproject/python:3.9
+entrypoint: /python/bin/fdk /function/func.py handler
+memory: 256
+config:
+  domain_ocids: <domain1-ocid>,<domain2-ocid>
+  execution_mode: disable
+  manage_capability: api_keys,auth_tokens,customer_secret_keys,db_credentials,o_auth2_client_credentials,smtp_credentials
+  tag_namespace: Capability
+
