@@ -2,6 +2,7 @@ import io
 import json
 import logging
 import oci
+from threading import Thread
 from fdk import response
 
 # Get Resource Principal Credentials
@@ -48,7 +49,7 @@ def process_users(user,identity_domains_client,tag_namespace,manage_capability,e
          )
          )
       patch_ops.operations = patch_ops_operations
-      identity_domains_client.patch_user(user_id=user_ocid, patch_op=patch_ops)
+      identity_domains_client.patch_user(user_id=user_ocid, patch_op=patch_ops,retry_strategy=oci.retry.DEFAULT_RETRY_STRATEGY)
 
 
 def handler(ctx, data: io.BytesIO=None):
@@ -95,12 +96,25 @@ def handler(ctx, data: io.BytesIO=None):
                list_users_response = identity_domains_client.list_users(page=list_users_response.next_page)
                users.extend(list_users_response.data.resources)
          count = 0
+         jobs = []
 
          for user in users:
-            process_users(user, identity_domains_client,tag_namespace,manage_capability,execution_mode)
+            #process_users(user, identity_domains_client, tag_namespace, manage_capability, execution_mode)
+
+            thread = Thread(target=process_users, args=(user, identity_domains_client, tag_namespace, manage_capability, execution_mode))
+            jobs.append(thread)
             count += 1
 
-      logging.getLogger().info(f'Processed {str(count)} users....')
+         # start threads
+         for job in jobs:
+            job.start()
+
+         # join threads,so we don't quit until all threads have finished
+         for job in jobs:
+            job.join()
+
+
+      logging.getLogger().info(f'Processed {str(count)} users for domain - {str(domain_endpoint)}....')
 
 
    except (Exception, ValueError) as ex:
