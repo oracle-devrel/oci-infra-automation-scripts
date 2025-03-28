@@ -8,8 +8,8 @@ This is a reference yaml as an action workflow to build and deploy the OCI funct
 ![Reference architecture of OCI Function deployment using Fn CLI](https://github.com/user-attachments/assets/6e541cc3-f40b-452e-bb93-bce84927f7d9)
 
 ### Pipeline Definition
-- [oci-fn-build.yml](./oci-fn-build.yml)
-- [oci-fn-deploy.yml](./oci-fn-deploy.yml)
+- [oci-fn-build.yml](.github/workflows/oci-fn-build.yml)
+- [oci-fn-deploy.yml](.github/workflows/oci-fn-deploy.yml)
 
 ### Build and Deploy Pipeline
 
