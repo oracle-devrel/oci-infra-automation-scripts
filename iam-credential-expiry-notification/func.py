@@ -10,6 +10,8 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from email.mime.base import MIMEBase
 
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
 # Get Resource Principal Credentials
 signer = oci.auth.signers.get_resource_principals_signer()
 
@@ -139,10 +141,15 @@ def send_email(subject,secret_client,cfg,BODY_HTML,report_data,recipient,report_
     #server.send_message(msg)
     server.close()
 
-def get_body_html(identity_domains_client,BODY_HTML,domain_name,credential_check,user_name,user_email,resource,resource_id,type,cfg,except_user,report_data):
+def get_body_html(identity_domains_client,BODY_HTML,domain_name,credential_check,user_name,user_email,resource,resource_id,type,cfg,except_user,report_data,enable_delete_on_expiry):
+
     report_date = str(datetime.datetime.strftime(datetime.datetime.now(), "%Y-%b-%d"))
     identifier = resource_id
-    created_time = datetime.datetime.strptime((resource.meta).created, "%Y-%m-%dT%H:%M:%S.%fZ")
+    if resource_id == "console_password":
+        created_time = datetime.datetime.strptime(resource, "%Y-%m-%dT%H:%M:%S.%fZ")
+
+    else:
+        created_time = datetime.datetime.strptime((resource.meta).created, "%Y-%m-%dT%H:%M:%S.%fZ")
     warning_date = created_time + datetime.timedelta(days=int(cfg["warning_in_days"]))
     critical_date = created_time + datetime.timedelta(days=int(cfg["critical_in_days"]))
     expiry_date = created_time + datetime.timedelta(days=int(cfg["expiry_in_days"]))
@@ -153,15 +160,16 @@ def get_body_html(identity_domains_client,BODY_HTML,domain_name,credential_check
         severity = "Expired"
 
         # Delete the credential
-        user_to_check = str(user_name)+"@"+str(domain_name)
-        if user_to_check.lower() not in except_user:
-            logging.getLogger().info(f'Deleting {resource.id}  {type} for {user_name} in {domain_name} domain')
-            if type == "api_key":
-                identity_domains_client.delete_api_key(resource.id)
-            elif type == "auth_token":
-                identity_domains_client.delete_auth_token(resource.id)
-            elif type == "customer_secret_key":
-                identity_domains_client.delete_customer_secret_key(resource.id)
+        if enable_delete_on_expiry == "true":
+            user_to_check = str(user_name)+"@"+str(domain_name)
+            if user_to_check.lower() not in except_user:
+                logging.getLogger().info(f'Deleting {resource.id}  {type} for {user_name} in {domain_name} domain')
+                if type == "api_key":
+                    identity_domains_client.delete_api_key(resource.id)
+                elif type == "auth_token":
+                    identity_domains_client.delete_auth_token(resource.id)
+                elif type == "customer_secret_key":
+                    identity_domains_client.delete_customer_secret_key(resource.id)
 
     elif critical_date < datetime.datetime.now():
         credential_check = False
@@ -186,6 +194,7 @@ def handler(ctx, data: io.BytesIO=None):
         cfg = ctx.Config()
         domain_ids = cfg["domain_ocids"]
         except_user_input = cfg["exception_users"].split(",")
+        enable_delete_on_expiry = cfg['enable_delete_on_expiry'].lower()
         except_user = []
         for item in except_user_input:
             except_user.append(str(item).lower())
@@ -218,7 +227,7 @@ def handler(ctx, data: io.BytesIO=None):
             while list_users_response.has_next_page:
                 list_users_response = identity_domains_client.list_users(page=list_users_response.next_page)
                 users.extend(list_users_response.data.resources)
-            logging.getLogger().info('fetched ' + str(len(users)) + ' users')
+            logging.getLogger().info('fetched ' + str(len(users)) + ' users'+ ' for domain : '+domain_name)
             for user in users:
                 user_ocid = user.ocid
                 user_name = user.user_name
@@ -263,18 +272,28 @@ def handler(ctx, data: io.BytesIO=None):
                 # get list of api keys for user
                 list_api_keys_response = identity_domains_client.list_api_keys(filter=f'user.ocid eq \"{user_ocid}\"').data
                 for api_key in list_api_keys_response.resources:
-                    BODY_HTML,credential_check,report_data = get_body_html(identity_domains_client,BODY_HTML,domain_name,credential_check,user_name,user_email,api_key,api_key.fingerprint,"api_key",cfg,except_user,report_data)
+                    BODY_HTML,credential_check,report_data = get_body_html(identity_domains_client,BODY_HTML,domain_name,credential_check,user_name,user_email,api_key,api_key.fingerprint,"api_key",cfg,except_user,report_data,enable_delete_on_expiry)
 
                 list_auth_tokens_response = identity_domains_client.list_auth_tokens(filter=f'user.ocid eq \"{user_ocid}\"').data
                 for auth_token in list_auth_tokens_response.resources:
-                    BODY_HTML,credential_check,report_data = get_body_html(identity_domains_client,BODY_HTML,domain_name,credential_check,user_name,user_email,auth_token,auth_token.description,"auth_token",cfg,except_user,report_data)
+                    BODY_HTML,credential_check,report_data = get_body_html(identity_domains_client,BODY_HTML,domain_name,credential_check,user_name,user_email,auth_token,auth_token.description,"auth_token",cfg,except_user,report_data,enable_delete_on_expiry)
 
                 list_customer_secret_keys_response = identity_domains_client.list_customer_secret_keys(filter=f'user.ocid eq \"{user_ocid}\"').data
                 for csk in list_customer_secret_keys_response.resources:
-                    BODY_HTML,credential_check,report_data = get_body_html(identity_domains_client,BODY_HTML,domain_name,credential_check,user_name,user_email,csk,csk.access_key,"customer_secret_key",cfg,except_user,report_data)
+                    BODY_HTML,credential_check,report_data = get_body_html(identity_domains_client,BODY_HTML,domain_name,credential_check,user_name,user_email,csk,csk.access_key,"customer_secret_key",cfg,except_user,report_data,enable_delete_on_expiry)
 
-                if credential_check:
-                    logging.getLogger().info('all credentials for user ' + user_name + ' are healthy')
+                password_info = identity_domains_client.search_users(
+                    user_search_request=oci.identity_domains.models.UserSearchRequest(
+                        schemas=["urn:ietf:params:scim:api:messages:2.0:SearchRequest"],
+                        attribute_sets=["all"],
+                        filter=f'ocid eq \"{user_ocid}\"'
+                        ),
+                    ).data.resources
+                pswd_last_modified = password_info[0].urn_ietf_params_scim_schemas_oracle_idcs_extension_password_state_user.last_successful_set_date
+                BODY_HTML, credential_check, report_data = get_body_html(identity_domains_client, BODY_HTML,domain_name, credential_check, user_name, user_email, pswd_last_modified, "console_password","console_password", cfg, except_user,report_data,enable_delete_on_expiry)
+
+                #if credential_check:
+                #   logging.getLogger().info('all credentials for user ' + user_name + ' are healthy')
 
             if credential_check :
                 continue
@@ -298,7 +317,7 @@ def handler(ctx, data: io.BytesIO=None):
             """
             #recipient = str(user_email).split(",")
             recipient = str(user_email)
-            logging.getLogger().info('sending email')
+            #logging.getLogger().info('sending email')
             send_email(SUBJECT,secret_client,cfg,BODY_HTML,"",recipient)
 
         if report_requested :
