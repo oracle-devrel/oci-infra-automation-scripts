@@ -26,7 +26,9 @@ This is a automation solution to receive early email notification for expiry IAM
 
   Allow dynamic-group <dynamic-group-name> to read secret-family in compartment <function-compartment> where target.secret.id='<ocid of smtp password vaultsecret>'
   Allow dynamic-group <dynamic-group-name> to inspect compartments in tenancy
-  ```
+  Allow dynamic-group <dynamic-group-name> to read domain in tenancy
+  Allow dynamic-group <dynamic-group-name> to read users in tenancy
+ ```
 
 ### Configure approved sender in email delivery
 An approved sender must be set up for all “From:” addresses sending mail through OCI.
