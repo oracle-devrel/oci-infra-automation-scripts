@@ -10,14 +10,15 @@ Reusable [Oracle Cloud Infrastructure (OCI)](https://www.oracle.com/cloud/) auto
 
 ## Solutions
 
-| Solution | What it does | Execution model | Documentation |
-| --- | --- | --- | --- |
-| [Auto-rotation credentials](auto-rotation-credentials/) | Rotates selected IAM credentials from OCI problem events, stores replacement secrets in OCI Vault, and sends an OCI Notifications message. | OCI Function, event-driven | [README](auto-rotation-credentials/README.md) |
-| [Custom metrics](custom-metrics/) | Collects local disk usage and publishes it as an OCI Monitoring custom metric. | Python script using instance principals | [README](custom-metrics/README.md) |
-| [Email-friendly notification](email-friendly-notification/) | Converts OCI event payloads into branded HTML emails using OCI Email Delivery and a Vault-held SMTP password. | OCI Function, event-driven | [README](email-friendly-notification/README.md) |
-| [Function CI/CD pipeline](fn-ci-cd-deployment-pipeline/) | GitHub Actions workflows that build and deploy an OCI Function with the Fn CLI. | GitHub Actions | [README](fn-ci-cd-deployment-pipeline/README.md) |
-| [IAM credential-expiry notification](iam-credential-expiry-notification/) | Identifies aging or expired Identity Domain credentials, emails users, and produces optional reports. | OCI Function, scheduled | [README](iam-credential-expiry-notification/README.md) |
-| [IAM user capability management](iam-user-capability-management/) | Enables or disables Identity Domain user capabilities according to defined tags. | OCI Function, event-driven or scheduled | [README](iam-user-capability-management/README.md) |
+| Solution                                           | What it does                                                                                                                               | Execution model                         | Documentation |
+|----------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------| --- |
+| [Auto-rotation credentials](auto-rotation-credentials/) | Rotates selected IAM credentials from OCI problem events, stores replacement secrets in OCI Vault, and sends an OCI Notifications message. | OCI Function, event-driven              | [README](auto-rotation-credentials/README.md) |
+| [Custom metrics](custom-metrics/)                  | Collects local disk usage and publishes it as an OCI Monitoring custom metric.                                                             | Python script using instance principals | [README](custom-metrics/README.md) |
+| [Email-friendly notification](email-friendly-notification/) | Converts OCI event payloads into branded HTML emails using OCI Email Delivery and a Vault-held SMTP password.                              | OCI Function, event-driven              | [README](email-friendly-notification/README.md) |
+| [Function CI/CD pipeline](fn-ci-cd-deployment-pipeline/) | GitHub Actions workflows that build and deploy an OCI Function with the Fn CLI.                                                            | GitHub Actions                          | [README](fn-ci-cd-deployment-pipeline/README.md) |
+| [IAM credential-expiry notification](iam-credential-expiry-notification/) | Identifies aging or expired Identity Domain credentials, emails users, and produces optional reports.                                      | OCI Function, scheduled                 | [README](iam-credential-expiry-notification/README.md) |
+| [IAM user capability management](iam-user-capability-management/) | Enables or disables Identity Domain user capabilities according to defined tags.                                                           | OCI Function, event-driven or scheduled | [README](iam-user-capability-management/README.md) |
+| [Backup OCI Function](backup-oci-function/)| Backup/download existing OCI Function deployed | Python Script |[README](backup-oci-function/README.md) |
 
 ## Before you begin
 
